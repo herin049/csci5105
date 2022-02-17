@@ -1,0 +1,109 @@
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+   http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<project name="pa0" default="pa0" basedir=".">
+    <description>CSCI 5105: Programming Assignment 0</description>
+
+    <property name="src" location="src" />
+    <property name="gen" location="gen-java" />
+    <property name="build" location="build" />
+
+    <path id="libs.classpath">
+        <fileset dir="../thrift/lib/java/build/libs">
+            <include name="libthrift*.jar" />
+            <exclude name="libthrift*test.jar" />
+            <exclude name="libthrift*javadoc.jar" />
+            <exclude name="libthrift*sources.jar" />
+        </fileset>
+        <fileset dir="../thrift/lib/java/build/deps">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+    <path id="build.classpath">
+        <path refid="libs.classpath" />
+        <pathelement path="${gen}" />
+    </path>
+    <path id="pa0.classpath">
+        <path refid="build.classpath" />
+        <pathelement path="${build}" />
+        <pathelement path="pa0.jar" />
+    </path>
+
+    <target name="init">
+        <tstamp />
+        <mkdir dir="${build}"/>
+        <mkdir dir="${build}/log"/>
+    </target>
+
+    <target name="compile" depends="init, generate">
+        <javac compiler="modern" includeantruntime="false" srcdir="${gen}" destdir="${build}" classpathref="libs.classpath" />
+        <javac compiler="modern" includeantruntime="false" srcdir="${src}" destdir="${build}" classpathref="build.classpath" />
+    </target>
+
+    <target name="test" depends="pa0" />
+
+    <target name="pa0" depends="compile">
+        <jar jarfile="pa0.jar" basedir="${build}"/>
+        <parallel>
+            <java classname="Server" fork="true" timeout="10000"
+                  classpathref="pa0.classpath" failonerror="false" output="${build}/log/pa0.log">
+            </java>
+            <sequential>
+                <sleep seconds="2"/>
+                <echo>Unsecure client:</echo>
+                <java classname="Client" classpathref="pa0.classpath" failonerror="true">
+                    <arg line="unsecure"/>
+                </java>
+                <echo>Secure client:</echo>
+                <java classname="Client" classpathref="pa0.classpath" failonerror="true">
+                    <arg line="secure"/>
+                </java>
+            </sequential>
+        </parallel>
+    </target>
+
+    <target name="generate">
+        <!-- Generate the thrift gen-java source -->
+        <exec executable="../thrift/compiler/cpp/thrift" failonerror="true">
+            <arg line="--gen java -r ./service.thrift"/>
+        </exec>
+    </target>
+
+    <target name="client" depends="compile">
+        <echo>Unsecure client:</echo>
+        <java classname="Client"
+              classpathref="pa0.classpath" failonerror="true">
+            <arg line="unsecure"/>
+        </java>
+        <echo>Secure client:</echo>
+        <java classname="Client"
+              classpathref="pa0.classpath" failonerror="true">
+            <arg line="secure"/>
+        </java>
+    </target>
+
+    <target name="server" depends="compile">
+        <java classname="Server" fork="true"
+              classpathref="pa0.classpath" failonerror="false" output="${build}/log/pa0.log">
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}" />
+        <delete dir="${gen}"/>
+        <delete file="pa0.jar" />
+    </target>
+</project>
