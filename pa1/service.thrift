@@ -3,15 +3,17 @@ exception TaskRejected {
 }
 
 struct Task {
-    1: string file_name
+    1: string data_dir;
+    2: string file_name;
 }
 
 struct Job {
-    1: list<string> file_names
+    1: string data_dir;
+    2: list<string> file_names;
 }
 
 service ServerService {
-    i32 process(1:Job job)
+    double process(1:Job job)
 }
 
 service ComputeService {
