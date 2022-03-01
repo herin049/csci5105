@@ -86,5 +86,47 @@ The shell script `test.sh` provides a convient way to run and test the system. U
 [Client] Server finished processing job in 3.0239341259002686 seconds.
 [Client] Finished processing the job 1 times in 3.0239341259002686 seconds for an average delay of 3.0239341259002686 seconds.
 ```
+The completion time of the system may differ from run to run, but the output should be similar and the process images should be present in the output directory. Likewise, one can also test to make sure the system can properly handle increasing the number of job samples. In the `config.json` file modify `num_samples` in the client options to be `10`. The output after making this change should look similar to the output below
+```bash
+[Compute 3] Initializing the compute handler with a load probability of 0.2, a load delay of 3 seconds and a compute policy of "random".
+[Compute 1] Initializing the compute handler with a load probability of 0.2, a load delay of 3 seconds and a compute policy of "random".
+[Compute 1] Starting compute node...
+...
+[Server] Finished processing job in 3.008856773376465 seconds.
+[Client] Server finished processing job in 3.008856773376465 seconds.
+[Client] Finished processing the job 10 times in 24.172236680984497 seconds for an average delay of 2.41722366809845 seconds.
+```
+Furthermore, one can test to ensure that the system properly injects delay. To do this, modify the `load_probs` to be `[1.0, 1.0, 1.0, 1.0]` in the compute options in the `config.json` file. After making these changes, one should expect to see delay injected once for each image
+```bash
+...
+[Server] Recieved job to process images [starry_night.jpg, mask.png, HappyFish.jpg, baboon.jpg, squirrel_cls.jpg, fruits.jpg] in the directory: ./data
+[Compute 2] Recieved task to process the file "starry_night.jpg".
+[Compute 2] Injecting delay of 3 seconds.
+[Compute 1] Recieved task to process the file "baboon.jpg".
+[Compute 1] Injecting delay of 3 seconds.
+[Compute 2] Recieved task to process the file "HappyFish.jpg".
+[Compute 2] Injecting delay of 3 seconds.
+[Compute 2] Recieved task to process the file "squirrel_cls.jpg".
+[Compute 1] Recieved task to process the file "mask.png".
+[Compute 2] Injecting delay of 3 seconds.
+[Compute 1] Injecting delay of 3 seconds.
+[Compute 1] Recieved task to process the file "fruits.jpg".
+[Compute 1] Injecting delay of 3 seconds.
+...
+```
+Finally, one can also test that the system properly handles the "load" compute policy by chaing the `compute_policy` to "load" in the configuation file. After changing the compute policy to "load", one should expect that eventually a compute node will reject a task, but regardless the job will still be fully carried out.
+```bash
+...
+[Compute 2] Recieved task to process the file "fruits.jpg".
+[Compute 2] Injecting delay of 3 seconds.
+[Compute 2] Recieved task to process the file "squirrel_cls.jpg".
+[Server] Compute node 3 rejected the task.
+[Server] Compute node 3 rejected the task.
+[Compute 2] Recieved task to process the file "starry_night.jpg".
+[Compute 2] Load exceeded, rejecting task.
+[Server] Compute node 3 rejected the task.
+[Server] Compute node 2 rejected the task.
+...
+```
 
 # Performance Evaluation Results
