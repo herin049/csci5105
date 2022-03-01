@@ -63,13 +63,14 @@ if __name__ == '__main__':
         file_names = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
         # Create the job
         job = Job(data_dir, file_names)
-        duration = 0
+        total_duration = 0
         # Submit the job "num_samples" times
         for _ in range(num_samples):
             print(f"[Client] Submitting job to process images [{', '.join(file_names)}] in the directory {data_dir}")
-            duration += client.process(job)
+            duration = client.process(job)
             print(f"[Client] Server finished processing job in {duration} seconds.")
+            total_duration += duration
     
         # Print the total time to complete and the average time per job
-        print(f"[Client] Finished processing the job {num_samples} times in {duration} seconds for an average delay of {duration / num_samples} seconds.")
+        print(f"[Client] Finished processing the job {num_samples} times in {total_duration} seconds for an average delay of {total_duration / num_samples} seconds.")
         transport.close()

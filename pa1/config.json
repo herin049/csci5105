@@ -1,6 +1,6 @@
 {
     "client": {
-        "num_jobs": 10
+        "num_samples": 100
     },
     "server": {},
     "compute": {
