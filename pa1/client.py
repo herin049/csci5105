@@ -33,7 +33,7 @@ def get_server():
     return server
 
 # Function to load the client config options from the "config.json" file
-def load_client_config() -> dict:
+def load_client_config():
     config = {}
     config_file = os.path.join(PROJ_PATH, 'config.json')
     if os.path.exists(config_file):
