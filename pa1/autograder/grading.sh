@@ -103,27 +103,38 @@ echo "ssh -t -n -f $USERID@$NODE_1_IP  ' ps -ef  > log_3  ' "  > grade3.sh
 echo "ssh -t -n -f $USERID@$NODE_2_IP  ' ps -ef > log_4  ' "  > grade4.sh
 echo "ssh -t -n -f $USERID@$NODE_3_IP  ' ps -ef > log_5  ' "  > grade5.sh
 
-echo "Waiting 60s for logging to complete ..."
-sleep 600
+
+jcount=`echo $NODE_COMMAND_0 | grep "/java" | wc -l`
+if [ $jcount -gt 0 ]; then
+   SERVER_COMMAND="/java"
+   CLIENT_COMMAND="/java"
+   NODE_COMMAND_0="/java"
+   NODE_COMMAND_1="/java"
+   NODE_COMMAND_2="/java"
+   NODE_COMMAND_3="/java"
+fi
+
 score=0
 for i in 0 1 2 3 4 5 
 do
     source grade$i.sh
+    echo "Waiting 120s for logging to complete ..."
+    sleep 120
     if [ $i -eq 0 ]; then 
       numlines=`cat ~/log_$i | grep "$SERVER_COMMAND" | wc -l`
     elif [ $i -eq 1 ]; then
       numlines=`cat ~/log_$i | grep "$CLIENT_COMMAND" | wc -l`
     elif [ $i -eq 2 ]; then
-      numlines=`cat ~/log_$i | grep "$NODE_0_COMMAND" | wc -l`
+      numlines=`cat ~/log_$i | grep "$NODE_COMMAND_0" | wc -l`
     elif [ $i -eq 3 ]; then
-      numlines=`cat ~/log_$i | grep "$NODE_1_COMMAND" | wc -l`
+      numlines=`cat ~/log_$i | grep "$NODE_COMMAND_1" | wc -l`
     elif [ $i -eq 4 ]; then
-      numlines=`cat ~/log_$i | grep "$NODE_2_COMMAND" | wc -l`
+      numlines=`cat ~/log_$i | grep "$NODE_COMMAND_2" | wc -l`
     elif [ $i -eq 5 ]; then
-      numlines=`cat ~/log_$i | grep "$NODE_3_COMMAND" | wc -l`
+      numlines=`cat ~/log_$i | grep "$NODE_COMMAND_3" | wc -l`
     fi
 
-    if [ $numlines -gt 1  ]; then
+    if [ $numlines -gt 0  ]; then
        score=`echo "scale=0;$score + 2 " | bc `
     fi
 done
