@@ -26,7 +26,7 @@ from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 
 # Function to process a task on a seperate thread
-def process_task(data_dir, file_name, compute_nodes):
+def process_task(data_dir: str, file_name: str, compute_nodes: list):
     while True:
         # Select a random node number from [0, len(compute_nodes)]
         node_num = randrange(len(compute_nodes))
@@ -48,10 +48,10 @@ def process_task(data_dir, file_name, compute_nodes):
         transport.close()
 
 class ServerHandler:
-    def __init__(self, compute_nodes):
+    def __init__(self, compute_nodes: list):
         self.compute_nodes = compute_nodes
     
-    def process(self, job):
+    def process(self, job: Job) -> float:
         print(f"[Server] Recieved job to process images [{', '.join(job.file_names)}] in the directory: {job.data_dir}")
 
         start = time.time()
@@ -73,7 +73,7 @@ class ServerHandler:
         return duration
 
 # Function to get the addresses of each of the compute nodes from the "machine.txt" file
-def get_compute_nodes():
+def get_compute_nodes() -> list:
     compute_nodes = []
     machine_file = os.path.join(PROJ_PATH, 'machine.txt')
     with open(machine_file) as f:

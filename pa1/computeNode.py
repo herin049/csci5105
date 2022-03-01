@@ -32,12 +32,12 @@ from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 
 class ComputeHandler:
-    def __init__(self, load_probability, load_delay, policy):
+    def __init__(self, load_probability: float, load_delay: float, policy: str):
         self.load_probability = load_probability
         self.load_delay = load_delay
         self.policy = policy
 
-    def process(self, task):
+    def process(self, task: Task) -> None:
         print(f"[Compute {node_num}] Recieved task to process the file \"{task.file_name}\".")
         # If the policy is "load", reject the task with probability load_probability
         if self.policy == 'load' and random() <= self.load_probability:
@@ -59,7 +59,7 @@ class ComputeHandler:
         
 
 # Function to load the compute config options from the "config.json" file
-def load_compute_config():
+def load_compute_config() -> dict:
     config = {}
     config_file = os.path.join(PROJ_PATH, 'config.json')
     if os.path.exists(config_file):

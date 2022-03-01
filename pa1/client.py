@@ -33,7 +33,7 @@ def get_server():
     return server
 
 # Function to load the client config options from the "config.json" file
-def load_client_config():
+def load_client_config() -> dict:
     config = {}
     config_file = os.path.join(PROJ_PATH, 'config.json')
     if os.path.exists(config_file):
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         transport.open()
 
         # Get the data directory and file names in the input directory
-        data_dir = PROJ_PATH
+        data_dir = os.path.join(PROJ_PATH, 'data')
         input_dir = os.path.join(data_dir, './input_dir')
         file_names = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
         # Create the job
