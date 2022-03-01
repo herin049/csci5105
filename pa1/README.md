@@ -16,6 +16,8 @@ The client implementation is also straightforward. First, the client will parse 
 
 # Operation & Usage
 
+
+
 As mentioned above, there are two main files used for configuring the system: the `machine.txt` file which contains a list of nodes followed by their machine address and the `config.json` file which contains options for each of the node types. 
 
 To run the project start by creating a Python virtual environment by typing
