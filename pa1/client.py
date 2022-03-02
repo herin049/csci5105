@@ -65,7 +65,7 @@ if __name__ == '__main__':
         total_duration = 0
         # Submit the job "num_samples" times
         for _ in range(num_samples):
-            print(f"[Client] Submitting job to process images [{', '.join(file_names)}] in the directory {data_dir}")
+            print(f"[Client] Submitting job to process images [{', '.join(file_names)}] in the directory {PROJ_PATH}")
             duration = client.process(job)
             print(f"[Client] Server finished processing job in {duration} seconds.")
             total_duration += duration
