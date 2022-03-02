@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     # Initialize and compute service processor
     processor = ComputeService.Processor(handler)
-    transport = TSocket.TServerSocket(host='127.0.0.1', port=node_port)
+    transport = TSocket.TServerSocket(port=node_port)
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
 
