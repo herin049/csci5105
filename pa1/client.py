@@ -11,7 +11,7 @@ if THRIFT_LIB_PATH is not None:
 # Initialize the project path
 PROJ_PATH = os.getenv('PROJ_PATH')
 if PROJ_PATH is None:
-    PROJ_PATH = '.'
+    PROJ_PATH = os.getcwd()
 
 from gen.service import ServerService
 from gen.service.ttypes import Job
@@ -58,11 +58,10 @@ if __name__ == '__main__':
         transport.open()
 
         # Get the data directory and file names in the input directory
-        data_dir = os.path.join(PROJ_PATH, 'data')
-        input_dir = os.path.join(data_dir, './input_dir')
+        input_dir = os.path.join(PROJ_PATH, 'input_dir')
         file_names = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
         # Create the job
-        job = Job(data_dir, file_names)
+        job = Job(PROJ_PATH, file_names)
         total_duration = 0
         # Submit the job "num_samples" times
         for _ in range(num_samples):
