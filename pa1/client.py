@@ -1,7 +1,6 @@
 import os
 import sys
 import glob
-import json
 
 # Load the thrift library
 THRIFT_LIB_PATH = os.getenv('THRIFT_LIB_PATH')
@@ -12,6 +11,9 @@ if THRIFT_LIB_PATH is not None:
 PROJ_PATH = os.getenv('PROJ_PATH')
 if PROJ_PATH is None:
     PROJ_PATH = os.getcwd()
+
+import json
+import time
 
 from gen.service import ServerService
 from gen.service.ttypes import Job
@@ -73,3 +75,6 @@ if __name__ == '__main__':
         # Print the total time to complete and the average time per job
         print(f"[Client] Finished processing the job {num_samples} times in {total_duration} seconds for an average delay of {total_duration / num_samples} seconds.")
         transport.close()
+
+        while True:
+            time.sleep(10)
