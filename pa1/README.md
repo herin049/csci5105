@@ -6,17 +6,15 @@ The project is implemented in Python, the source for the client can be found in 
 
 At a high level, the system works by having the client initially submit a job to the server with a data directory and a list of files to process. Next, the server will take each of these files and create a task for each one, assigning each task to a random compute node. Under the "random" policy, each compute node will always accept the task and simply inject delay randomly depending on its "load probability". After processing the image, each compute node will write its result into the output directory. Once all tasks have completed, the server will return the elapsed time in seconds to the client. A more details description of the requirements and design of the system can be found in the Programming Assignment 1 PDF.
 
-As mentioned earlier, the project is implemented in Python. Furthermore, the [Thrift](https://thrift.apache.org/) and [OpenCV](https://opencv.org/) libraries are used in the project. The project's Thrift objects are defined in the `service.thrift` file. This file contains a few structures and services, most notably the `ServerService` which defines the service the server implements which accepts a `Job` returns the elapsed time as a double, and the `ComputeService` which accept a `Task` and potentially throws a `TaskRejected` exception.
+As mentioned earlier, the project is implemented in Python. Furthermore, the [Thrift](https://thrift.apache.org/) and [OpenCV](https://opencv.org/) libraries are used in the project. The project's Thrift objects are defined in the `service.thrift` file. This file contains a few structures and services, most notably the `ServerService` which defines the service the server implements which accepts a `Job` returning the elapsed time as a double, and the `ComputeService` which accept a `Task` and potentially throws a `TaskRejected` exception.
 
 The compute node implementation is relatively straightforward. Under the "load" policy, the compute node will reject the task with probability equal to its load probability, which can be defined in the configuration file. Furthermore, if it accepts the task, it will inject delay again based on its load probability. The amount of delay injected can be specified in the configuation file. After injecting delay, the compute node will process the image by coloring it gray and applying the OpenCv Canny filter, writing the result to the output directory. 
 
 The server implementation is slightly more involved. When the server recieves a job from the client, it will create a `Task` object for each file sent by the client. Then, it will create a seperate thread for each task where it will randomly assign the task to a given compute node. The list of compute nodes is given in the `machine.txt` file and parsed by the server. Once all of the tasks have been processed, the server returns the elapsed time in seconds to the client. 
 
-The client implementation is also straightforward. First, the client will parse the `machine.txt` file to get the address of the server. Then, the client will collect all of the file names in the directory `PROJ_PATH/data/input_dir` where `PROJ_PATH` is provided as an environment variable or just the current working directory by default. Then, the client will create the job and submit it to the server. Furthermore, for testing purposes one can choose to have the client submit the same job multiple times by changing the `num_samples` field in the configuration file. The client will print out the total time it took for all the sample as well as the average time. 
+The client implementation is also straightforward. First, the client will parse the `machine.txt` file to get the address of the server. Then, the client will collect all of the file names in the directory `PROJ_PATH/input_dir` where `PROJ_PATH` is provided as an environment variable or just the current working directory by default. Then, the client will create the job and submit it to the server. Furthermore, for testing purposes one can choose to have the client submit the same job multiple times by changing the `num_samples` field in the configuration file. The client will print out the total time it took for all the sample as well as the average time. 
 
 # Operation & Usage
-
-
 
 As mentioned above, there are two main files used for configuring the system: the `machine.txt` file which contains a list of nodes followed by their machine address and the `config.json` file which contains options for each of the node types. 
 
@@ -54,9 +52,13 @@ and the client can be ran by executing
 python client.py
 ```
 
+## Assumptions Made & Grading
+
+In order for the grading script provided for the assignment to work properly, there are a few key requirements that must be satisfied. Firstly, the `PROJ_PATH` environment variable should be set to the project directory if the files are being ran outside the default project directory. Furthermore, both directories `input_dir` and `output_dir` should be located in the `PROJ_PATH` directory, and the `machine.txt` file should also be located in the `PROJ_PATH` directory. Additionally, `THRIFT_LIB_PATH` should point to your Thrift installation. Because the project is using Python 3, make sure that `OPENCV_LIB_PATH` is set to `.../opencv/build/lib/python3` and not `.../opencv/build/lib` to ensure that OpenCv is installed correctly. Finally, because the project is using Python 3, make sure that each of the commands in the `commands.txt` file are using `python3` and not `python`.
+
 # Test Cases & Expected Output
 
-The shell script `test.sh` provides a convient way to run and test the system. Using the default options provided in the `config.json` file and the default images in the data directory, one should expect an output similar to the output below 
+The shell script `test.sh` provides a convenient way to run and test the system. Using the default options provided in the `config.json` file and the default images in the data directory, one should expect an output similar to the output below 
 ```bash
 [Compute 3] Initializing the compute handler with a load probability of 0.2, a load delay of 3 seconds and a compute policy of "random".
 [Compute 0] Initializing the compute handler with a load probability of 0.2, a load delay of 3 seconds and a compute policy of "random".
