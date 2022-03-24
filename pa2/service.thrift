@@ -22,8 +22,11 @@ service SuperNodeService {
 service ChordNodeService {
     void put(1:string word, 2:string definition) throws(1:DuplicateWord error);
     string get(1:string word) throws (1:WordNotFound error);
+    NodeInfo find_predecessor(1:i64 key);
     NodeInfo find_successor(1:i64 key);
     NodeInfo get_predecessor();
+    NodeInfo get_successor();
     void update_predecessor(1:NodeInfo new_predecessor);
+    void update_successor(1:NodeInfo new_successor);
     void update_finger_table(1:NodeInfo new_node, 2:i64 index);
 }

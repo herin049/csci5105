@@ -1,0 +1,4 @@
+put cat foo
+put dog bar
+get cat
+get dog
