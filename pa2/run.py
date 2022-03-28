@@ -41,7 +41,7 @@ if __name__ == '__main__':
             print('Shutting down remote proccesses...')
             for p in remote_processes:
                 shutdown_processes.append(Popen(f'ssh {user}@{p[0]} "pkill -f {p[1]}"', shell=True))
-        time.sleep(30)
+            time.sleep(30)
         for p in shutdown_processes:
             p.kill()
         exit(1)
@@ -60,7 +60,10 @@ if __name__ == '__main__':
         processes.append(ssh_process)
 
     print('Waiting for super node to start...')
-    time.sleep(20)
+    if len(remote_processes) > 0:
+        time.sleep(20)
+    else:
+        time.sleep(5)
 
     for i, node in enumerate(config['chord_nodes']):
         chord_node_ip = node['ip']
@@ -74,7 +77,10 @@ if __name__ == '__main__':
             processes.append(ssh_process)
     
     print('Waiting for DHT to be constructed...')
-    time.sleep(len(config['chord_nodes']) * 10)
+    if len(remote_processes) > 0:
+        time.sleep(len(config['chord_nodes']) * 10)
+    else:
+        time.sleep(5)
 
     client_process = Popen([python_loc, 'client.py', config_file])
     processes.append(client_process)

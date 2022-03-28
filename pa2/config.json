@@ -7,31 +7,34 @@
         "put cat foo",
         "put dog bar",
         "get cat",
-        "get dog"
+        "get dog",
+        "load dictionary.txt",
+        "get TRYSTER",
+        "get PHORONE"
     ],
     "super_node": {
-        "ip": "kh4250-02.cselabs.umn.edu",
+        "ip": "127.0.0.1",
         "port": 8080
     },
     "chord_nodes": [
         {
-            "ip": "kh4250-02.cselabs.umn.edu",
+            "ip": "127.0.0.1",
             "port": 8081
         },
         {
-            "ip": "kh4250-02.cselabs.umn.edu",
+            "ip": "127.0.0.1",
             "port": 8082
         },
         {
-            "ip": "kh4250-02.cselabs.umn.edu",
+            "ip": "127.0.0.1",
             "port": 8083
         },
         {
-            "ip": "kh4250-02.cselabs.umn.edu",
+            "ip": "127.0.0.1",
             "port": 8084
         },
         {
-            "ip": "kh4250-02.cselabs.umn.edu",
+            "ip": "127.0.0.1",
             "port": 8085
         }
     ]

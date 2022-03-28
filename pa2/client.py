@@ -61,6 +61,17 @@ if __name__ == '__main__':
             log(f'Retrieving definition for word "{word}" from the DHT.')
             definition = chord_client.get(word)
             log(f'Word "{word}" has definition: "{definition}".')
+        elif command == 'load':
+            file_name = parts[1]
+            log(f'Loading dictionary file "{file_name}".')
+            with open(file_name, 'r') as file:
+                lines = file.read().splitlines()
+                for word, definition in zip(lines[0::2], lines[1::2]):
+                    if len(word) > 0 and len(definition) > 0:
+                        definition_text = definition.split('Defn: ')[1]
+                        log(f'Inserting word "{word}" with definition "{definition_text}" into the DHT.')
+                        chord_client.put(word, definition_text)
+            log(f'Finished loading dictionary file.')
         else:
             log(f'Unknown command.')
     end = time.time()

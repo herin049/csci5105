@@ -35,7 +35,7 @@ class ChordNodeHandler:
     def put(self, word: str, definition: str) -> None:
         word_id = hash(word, self.num_bits)
         log(f'Associating "{word}" ({word_id}) with definition "{definition}".', self.node_info)
-        if word in self.table:
+        if self.caching and word in self.table:
             log(f'Error, word "{word}" ({word_id}) is already present in the DHT.', self.node_info)
             raise DuplicateWord()
         elif inrange(self.predecessor.id, self.node_info.id - 1, word_id):
@@ -62,7 +62,7 @@ class ChordNodeHandler:
         word_id = hash(word, self.num_bits)
         log(f'Retrieving definition for word "{word}" ({word_id})', self.node_info)
         if word in self.table:
-            log(f'Word found in table "{word}" ({word_id}) to be {self.table[word]}, returning result.', self.node_info)
+            log(f'Word found in table "{word}" ({word_id}) to be "{self.table[word]}", returning result.', self.node_info)
             return self.table[word]
         elif inrange(self.predecessor.id, self.node_info.id - 1, word_id):
             if word not in self.table:
