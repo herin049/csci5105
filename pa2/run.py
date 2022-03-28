@@ -49,7 +49,7 @@ if __name__ == '__main__':
         processes.append(Popen([python_loc, 'supernode.py', config_file]))
     else:
         remote_processes.append((super_node_ip, 'supernode.py'))
-        ssh_process = Popen(f'ssh {user}@{super_node_ip} "cd {cwd} && {python_loc} supernode.py {config_file}"', shell=True).wait()
+        ssh_process = Popen(f'ssh {user}@{super_node_ip} "cd {cwd} && {python_loc} supernode.py {config_file}"', shell=True)
         time.sleep(10)
         ssh_process.kill()
 
