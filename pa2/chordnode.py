@@ -8,7 +8,8 @@ if THRIFT_LIB_PATH is not None:
     sys.path.insert(0, glob.glob(THRIFT_LIB_PATH)[0])
 
 import time
-from utils import hash, inrange
+
+from utils import hash, inrange, load_config
 from typing import List, Tuple
 from threading import Thread
 
@@ -33,21 +34,24 @@ class ChordNodeHandler:
 
     def put(self, word: str, definition: str) -> None:
         word_id = hash(word, self.num_bits)
-        log(f'Assigning word "{word}" ({word_id}) to {definition}', self.node_info)
+        log(f'Associating "{word}" ({word_id}) with definition "{definition}".', self.node_info)
         if word in self.table:
+            log(f'Error, word "{word}" ({word_id}) is already present in the DHT.', self.node_info)
             raise DuplicateWord()
         elif inrange(self.predecessor.id, self.node_info.id - 1, word_id):
+            log(f'Word "{word}" ({word_id}) inserted with definition "{definition}".', self.node_info)
             self.table[word] = definition
             return
         elif self.caching:
+            log(f'Caching word "{word}" ({word_id}) with definition "{definition}".', self.node_info)
             self.table[word] = definition
-        log(f'Locating the successor for word "{word}" ({word_id})', self.node_info)
-        successor = self.find_successor(word_id)
-        log(f'Found successor for word "{word}" ({word_id}): {successor.id}', self.node_info)
-        client, transport = connect(successor)
+        finger = self.get_preceding_finger(word_id)
+        if finger == self.node_info:
+            raise RuntimeError('Error while calling put.')
+        client, transport = connect(finger)
         transport.open()
         try:
-            log(f'Calling put on the successor for word "{word}" ({word_id})', self.node_info)
+            log(f'Forwarding request to insert "{word}" ({word_id}) with definition "{definition}" to {finger.ip}:{finger.port} ({finger.id}).', self.node_info)
             client.put(word, definition)
         except DuplicateWord as e:
             transport.close()
@@ -62,15 +66,16 @@ class ChordNodeHandler:
             return self.table[word]
         elif inrange(self.predecessor.id, self.node_info.id - 1, word_id):
             if word not in self.table:
+                log(f'Error, word "{word}" ({word_id}) was not found in the DHT.', self.node_info)
                 raise WordNotFound()
             return self.table[word]
-        log(f'Locating the successor for word "{word}" ({word_id})', self.node_info)
-        successor = self.find_successor(word_id)
-        log(f'Found successor for word "{word}" ({word_id}): {successor.id}', self.node_info)
-        client, transport = connect(successor)
+        finger = self.get_preceding_finger(word_id)
+        if finger == self.node_info:
+            raise RuntimeError('Error while calling get.')
+        client, transport = connect(finger)
         transport.open()
         try:
-            log(f'Calling get on the successor for word "{word}" ({word_id})', self.node_info)
+            log(f'Forwarding request to retrieve definition for word "{word}" ({word_id}) to {finger.ip}:{finger.port} ({finger.id})', self.node_info)
             definition = client.get(word)
         except WordNotFound as e:
             transport.close()
@@ -86,16 +91,15 @@ class ChordNodeHandler:
 
     def find_predecessor(self, key: int) -> NodeInfo:
         if inrange(self.node_info.id + 1, self.finger_table[0].id, key):
-            log(f'Predecessor is in range ({self.predecessor.id}, {self.finger_table[0].id}], returning current node info.', self.node_info)
+            log(f'Key {key} is in the range ({self.predecessor.id}, {self.finger_table[0].id}], returning current node info as the predecessor.', self.node_info)
             return self.node_info
         finger = self.get_preceding_finger(key)
         if finger == self.node_info:
             raise RuntimeError('Error while finding predecessor.')
-        log(f'Looking up the predecessor for key {key}', self.node_info)
+        log(f'Forwarding request to find the predecessor of {key} to {finger.ip}:{finger.port} ({finger.id}).', self.node_info)
         client, transport = connect(finger)
         transport.open()
         predecessor = client.find_predecessor(key)
-        log(f'Found the predecessor for {key}: {predecessor.id}', self.node_info)
         transport.close()
         return predecessor
 
@@ -106,7 +110,7 @@ class ChordNodeHandler:
         client, transport = connect(predecessor)
         transport.open()
         successor = client.get_successor()
-        log(f'Found the successor for {key}: {successor.id}', self.node_info)
+        log(f'Found the successor for key {key} to be {successor.ip}:{successor.port} ({successor.id}).', self.node_info)
         transport.close()
         return successor
 
@@ -117,7 +121,7 @@ class ChordNodeHandler:
         return self.finger_table[0]
 
     def update_predecessor(self, new_predecessor: NodeInfo) -> None:
-        log(f'Updating predecessor from {self.predecessor.id} to {new_predecessor.id}', self.node_info)
+        log(f'Updating predecessor from {self.predecessor.id} to {new_predecessor.id}.', self.node_info)
         self.predecessor = new_predecessor
 
     def update_successor(self, new_successor: NodeInfo) -> None:
@@ -153,13 +157,13 @@ def get_join_node(super_node_ip: str, super_node_port: int, node_info: NodeInfo,
     transport.open()
     while True:
         try:
-            log('Requesting join node from super node.', node_info)
+            log('Requesting a join node from super node.', node_info)
             join_node = client.get_join_node(node_info.ip, node_info.port)
-            log('Successfully received join node from super node.', node_info)
+            log('Successfully received a join node from super node.', node_info)
             transport.close()
             return join_node
         except DHTBusy as e:
-            log('DHT busy, sleeping...', node_info)
+            log('The DHT is busy, sleeping...', node_info)
             time.sleep(sleep_delay)
     
 
@@ -207,7 +211,7 @@ def init_chord_node(super_node_ip: str, super_node_port: int, node_ip: str, node
         pred_client.update_successor(node_info)
         pred_transport.close()
         node_handler = ChordNodeHandler(node_info, predecessor, finger_table, num_bits, caching)
-        log(f'Finger table initialized to {node_handler.get_pretty_finger_table()}', node_handler.node_info)
+        log(f'Finger table initialized to {node_handler.get_pretty_finger_table()}.', node_handler.node_info)
         for i in range(num_bits):
             update_id = (node_info.id - (2 ** i) + 1 + 2 ** num_bits) % (2 ** num_bits)
             update_node = node_handler.find_predecessor(update_id)
@@ -233,21 +237,27 @@ def log(message, node_info: NodeInfo):
         print(f'[Chord Node {node_info.id}] {message}')
 
 if __name__ == '__main__':
-    if len(sys.argv) < 7:
+    if len(sys.argv) < 2:
         print('[Chord Node] Insufficient number of arguments.')
-    super_node_ip = sys.argv[1].split(':')[0]
-    super_node_port = int(sys.argv[1].split(':')[1])
-    node_ip = sys.argv[2].split(':')[0]
-    node_port = int(sys.argv[2].split(':')[1])
-    sleep_delay = int(sys.argv[3])
-    num_bits = int(sys.argv[4])
-    caching = int(sys.argv[5]) > 0
-    DEBUG = int(sys.argv[6]) > 0
+    node_num = int(sys.argv[1])
+    config_file = 'config.json'
+    if len(sys.argv) > 2:
+        config_file = sys.argv[2]
+    config = load_config(config_file)
+
+    super_node_ip = config['super_node']['ip']
+    super_node_port = config['super_node']['port']
+    node_ip = config['chord_nodes'][node_num]['ip']
+    node_port = config['chord_nodes'][node_num]['port']
+    sleep_delay = config['sleep_delay']
+    num_bits = config['num_bits']
+    caching = config['caching']
+    DEBUG = config['debug']
 
     if super_node_ip is None:
-        print(f'[Chord Node] Error, supernode ip was not provided.')
+        print('[Chord Node] Error, supernode ip was not provided.')
     elif super_node_port is None:
-        print(f'[Chord Node] Error, supernode port was not provided.')
+        print('[Chord Node] Error, supernode port was not provided.')
     else:
         chord_server = init_chord_node(super_node_ip, super_node_port, node_ip, node_port, sleep_delay, num_bits, caching)
         chord_thread = Thread(target=start_server, args=(chord_server,))

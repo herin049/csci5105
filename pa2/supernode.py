@@ -7,13 +7,12 @@ THRIFT_LIB_PATH = os.getenv('THRIFT_LIB_PATH')
 if THRIFT_LIB_PATH is not None:
     sys.path.insert(0, glob.glob(THRIFT_LIB_PATH)[0])
 
-from utils import hash
-
 import random
-from typing import List
 from threading import Lock
 
-from gen.service import ChordNodeService, SuperNodeService
+from utils import hash, load_config
+
+from gen.service import SuperNodeService
 from gen.service.ttypes import NodeInfo, DHTBusy
 
 from thrift.transport import TSocket
@@ -58,12 +57,15 @@ def log(message):
         print(f'[Super Node] {message}')
 
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
-        print('[Super Node] Insufficient number of arguments.')
-    super_node_ip = sys.argv[1].split(':')[0]
-    super_node_port = int(sys.argv[1].split(':')[1])
-    num_bits = int(sys.argv[2])
-    DEBUG = int(sys.argv[3]) > 0
+    config_file = 'config.json'
+    if len(sys.argv) > 1:
+        config_file = sys.argv[1]
+    config = load_config(config_file)
+
+    super_node_ip = config['super_node']['ip']
+    super_node_port = config['super_node']['port']
+    num_bits = config['num_bits']
+    DEBUG = config['debug']
     
     handler = SuperNodeHandler(num_bits)
     processor = SuperNodeService.Processor(handler)

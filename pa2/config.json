@@ -1,0 +1,38 @@
+{
+    "debug": true,
+    "caching": true,
+    "num_bits": 16,
+    "sleep_delay": 1,
+    "client_commands": [
+        "put cat foo",
+        "put dog bar",
+        "get cat",
+        "get dog"
+    ],
+    "super_node": {
+        "ip": "kh4250-02.cselabs.umn.edu",
+        "port": 8080
+    },
+    "chord_nodes": [
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8081
+        },
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8082
+        },
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8083
+        },
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8084
+        },
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8085
+        }
+    ]
+}
