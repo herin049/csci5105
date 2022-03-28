@@ -63,9 +63,9 @@ if __name__ == '__main__':
     print('Waiting for super node to start...')
 
     for i, node in enumerate(config['chord_nodes']):
-        print('Starting chord node {i}.')
         chord_node_ip = node['ip']
         chord_node_port = node['port']
+        print(f'Starting chord node {i} ({chord_node_ip}:{chord_node_port}).')
         if chord_node_ip == '127.0.0.1':
             processes.append(Popen([python_loc, 'chordnode.py', str(i), config_file]))
         else:
