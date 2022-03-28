@@ -57,13 +57,13 @@ if __name__ == '__main__':
     else:
         remote_processes.append((super_node_ip, 'supernode.py'))
         ssh_process = Popen(f'ssh {user}@{super_node_ip} "cd {cwd} && {python_loc} supernode.py {config_file}"', shell=True)
-        time.sleep(10)
+        time.sleep(30)
         ssh_process.kill()
 
     print('Waiting for super node to start...')
-    time.sleep(10)
 
     for i, node in enumerate(config['chord_nodes']):
+        print('Starting chord node {i}.')
         chord_node_ip = node['ip']
         chord_node_port = node['port']
         if chord_node_ip == '127.0.0.1':
@@ -71,7 +71,7 @@ if __name__ == '__main__':
         else:
             remote_processes.append((chord_node_ip, 'chordnode.py'))
             ssh_process = Popen(f'ssh {user}@{chord_node_ip} "cd {cwd} && {python_loc} chordnode.py {i} {config_file}"', shell=True)
-            time.sleep(10)
+            time.sleep(30)
             ssh_process.kill()
     
     print('Waiting for DHT to be constructed.')
