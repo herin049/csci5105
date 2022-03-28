@@ -9,6 +9,7 @@ import time
 
 from utils import load_config
 
+
 if __name__ == '__main__':
     config_file = 'config.json'
     if len(sys.argv) > 1:
@@ -23,9 +24,11 @@ if __name__ == '__main__':
     processes = []
     cwd = os.getcwd()
     python_loc = os.path.join(cwd, 'venv/bin/python')
+    global shutting_down
     shutting_down = False
 
     def cleanup(sig, frame):
+        global shutting_down
         if shutting_down:
             return
         shutting_down = True
