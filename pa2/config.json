@@ -10,7 +10,8 @@
         "get dog",
         "load dictionary.txt",
         "get TRYSTER",
-        "get PHORONE"
+        "get PHORONE",
+        "get banana"
     ],
     "super_node": {
         "ip": "127.0.0.1",

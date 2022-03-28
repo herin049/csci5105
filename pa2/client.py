@@ -14,6 +14,7 @@ import time
 from utils import load_config
 
 from gen.service import SuperNodeService, ChordNodeService
+from gen.service.ttypes import DuplicateWord, WordNotFound
 
 from thrift.transport import TSocket
 from thrift.protocol import TBinaryProtocol
@@ -56,11 +57,17 @@ if __name__ == '__main__':
         if command == 'put':
             definition = parts[2]
             log(f'Inserting word "{word}" with definition "{definition}" into the DHT.')
-            chord_client.put(word, definition)
+            try:
+                chord_client.put(word, definition)
+            except DuplicateWord as e:
+                log(f'Error, word "{word}" is already in the DHT.')
         elif command == 'get':
             log(f'Retrieving definition for word "{word}" from the DHT.')
-            definition = chord_client.get(word)
-            log(f'Word "{word}" has definition: "{definition}".')
+            try:
+                definition = chord_client.get(word)
+                log(f'Word "{word}" has definition: "{definition}".')
+            except WordNotFound as e:
+                log(f'Word "{word}" has no definition associated to it.')
         elif command == 'load':
             file_name = parts[1]
             log(f'Loading dictionary file "{file_name}".')
@@ -70,7 +77,10 @@ if __name__ == '__main__':
                     if len(word) > 0 and len(definition) > 0:
                         definition_text = definition.split('Defn: ')[1]
                         log(f'Inserting word "{word}" with definition "{definition_text}" into the DHT.')
-                        chord_client.put(word, definition_text)
+                        try:
+                            chord_client.put(word, definition_text)
+                        except DuplicateWord as e:
+                            log(f'Error, word "{word}" is already in the DHT.')
             log(f'Finished loading dictionary file.')
         else:
             log(f'Unknown command.')
