@@ -33,9 +33,10 @@ if __name__ == '__main__':
         if len(remote_processes) > 0:
             print('Shutting down remote proccesses...')
             for p in remote_processes:
-                shutdown_processes.append(Popen(['ssh', f'{user}&{p[0]}', f'"killall {p[1]}"'], shell=True))
+                shutdown_processes.append(Popen(f'ssh {user}@{p[0]} "pkill -f {p[1]}"', shell=True))
+        time.sleep(30)
         for p in shutdown_processes:
-            p.wait()
+            p.kill()
         exit(1)
 
     signal.signal(signal.SIGINT, cleanup)
@@ -48,7 +49,9 @@ if __name__ == '__main__':
         processes.append(Popen([python_loc, 'supernode.py', config_file]))
     else:
         remote_processes.append((super_node_ip, 'supernode.py'))
-        Popen(f'ssh {user}@{super_node_ip} "cd {cwd} && {python_loc} supernode.py {config_file}"', shell=True).wait()
+        ssh_process = Popen(f'ssh {user}@{super_node_ip} "cd {cwd} && {python_loc} supernode.py {config_file}"', shell=True).wait()
+        time.sleep(10)
+        ssh_process.kill()
 
     print('Waiting for super node to start...')
     time.sleep(10)
@@ -60,7 +63,9 @@ if __name__ == '__main__':
             processes.append(Popen([python_loc, 'chordnode.py', str(i), config_file]))
         else:
             remote_processes.append((chord_node_ip, 'chordnode.py'))
-            Popen(['ssh', f'{user}@{chord_node_ip}', f'"cd {cwd} && {python_loc} chordnode.py {i} {config_file}"'], shell=True).wait()
+            ssh_process = Popen(f'ssh {user}@{chord_node_ip} "cd {cwd} && {python_loc} chordnode.py {i} {config_file}"', shell=True)
+            time.sleep(10)
+            ssh_process.kill()
     
     print('Waiting for DHT to be constructed.')
     time.sleep(len(config['chord_nodes']) * 5)
