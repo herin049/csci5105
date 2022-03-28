@@ -57,10 +57,10 @@ if __name__ == '__main__':
     else:
         remote_processes.append((super_node_ip, 'supernode.py'))
         ssh_process = Popen(f'ssh {user}@{super_node_ip} "cd {cwd} && {python_loc} supernode.py {config_file}"', shell=True)
-        time.sleep(30)
-        ssh_process.kill()
+        processes.append(ssh_process)
 
     print('Waiting for super node to start...')
+    time.sleep(20)
 
     for i, node in enumerate(config['chord_nodes']):
         chord_node_ip = node['ip']
@@ -71,11 +71,10 @@ if __name__ == '__main__':
         else:
             remote_processes.append((chord_node_ip, 'chordnode.py'))
             ssh_process = Popen(f'ssh {user}@{chord_node_ip} "cd {cwd} && {python_loc} chordnode.py {i} {config_file}"', shell=True)
-            time.sleep(30)
-            ssh_process.kill()
+            processes.append(ssh_process)
     
-    print('Waiting for DHT to be constructed.')
-    time.sleep(len(config['chord_nodes']) * 5)
+    print('Waiting for DHT to be constructed...')
+    time.sleep(len(config['chord_nodes']) * 10)
 
     client_process = Popen([python_loc, 'client.py', config_file])
     processes.append(client_process)
