@@ -23,8 +23,12 @@ if __name__ == '__main__':
     processes = []
     cwd = os.getcwd()
     python_loc = os.path.join(cwd, 'venv/bin/python')
+    shutting_down = False
 
     def cleanup(sig, frame):
+        if shutting_down:
+            return
+        shutting_down = True
         shutdown_processes = []
         if len(processes) > 0:
             print('Shutting down processes...')
