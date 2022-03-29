@@ -10,7 +10,7 @@ A significant portion of the logic in the system is derived from the work presen
  
 As mentioned earlier, the only responsibility of the super node is to provide access into the DHT and coordinate nodes joining the DHT. As a result, its implementation is relatively straightforward. When a chord node makes a request to the super node to join the DHT, the super node first attempts to acquire a mutex. If the mutex could not be acquired, the super node will throw a `DHTBusy` exception. Otherwise, if the DHT is empty the super node will return an empty node information object, letting the chord node know that it is the first node in the DHT. If the DHT is not empty, the super node will return a random node from the list of nodes already in the DHT. In both cases, the super node will add the joining node to a list of nodes in the system. When a node makes a call to the super node to notify it that the node has finished joining the DHT, the mutex will be released, allowing other chord nodes to join the DHT. If a client makes a request to the super node for a chord node, the super node will simply randomly return a chord node in its list of chord nodes. 
 
-The implementation for the client is also relatively straightforward. First, the client will make a request to the super node to receive a reference to a node in the DHT. After receiving a reference to a chord ndoe in the DHT, it will subsequently execute each of the commands provided in the configuration file. There are four client commands. The `get` command accepts one argument which is the word to retrieve the definition. For example, the command `get foo` will retrieve the definition for the word `foo` and output it to the console. Likewise, the `put` command accepts a word and a definition as arguments. For example, the command `put foo cat` will store `cat` as the definition for `foo`. The `store` command accepts a text file as its only argument which contains words and definitions provided in the format seen in the `dictionary_words.txt` file. An insertion will be made into the DHT for each word and definition in the provided file. For example, the command `store dictionary_words.txt` will insert each word and its corresponding definition from the file `dictionary_words.txt` into the DHT. Finally, the `load` command accepts a text file which contains a list of words seperated by a new line. Furthermore, it optionally accepts a second argument which is the destination file to store the definitions for each word found in the DHT. The `load` command also outputs the definitions to console. For example, the command `load words.txt defs.txt` will load the definitions for each word in `words.txt` and store the definitions into the file `defs.txt`.
+The implementation for the client is also relatively straightforward. First, the client will make a request to the super node to receive a reference to a node in the DHT. After receiving a reference to a chord ndoe in the DHT, it will subsequently execute each of the commands provided in the configuration file. There are four client commands. The `get` command accepts one argument which is the word to retrieve the definition. For example, the command `get foo` will retrieve the definition for the word `foo` and output it to the console. Likewise, the `put` command accepts a word and a definition as arguments. For example, the command `put foo cat` will store `cat` as the definition for `foo`. The `store` command accepts a text file as its only argument which contains words and definitions provided in the format seen in the `dictionary.txt` file. An insertion will be made into the DHT for each word and definition in the provided file. For example, the command `store dictionary.txt` will insert each word and its corresponding definition from the file `dictionary.txt` into the DHT. Finally, the `load` command accepts a text file which contains a list of words seperated by a new line. Furthermore, it optionally accepts a second argument which is the destination file to store the definitions for each word found in the DHT. The `load` command also outputs the definitions to console. For example, the command `load dictionary_words.txt defs.txt` will load the definitions for each word in `dictionary_words.txt` and store the definitions into the file `defs.txt`.
 
 # Operation & Usage
 
@@ -114,6 +114,210 @@ It is important to note that the `run.py` script should always be ran in the roo
 
 In the `configs` directory there are several configuration files used for testing the system. To run the system with any of these configuration files, simply provide the location to the configuration file as the only argument to the run script. For example, execute `python run.py configs/test_basic` to use the basic configuration. 
 
+## Test Case 1: Basic Functionality
+
+As an initial test case, we expect the system to function properly under very simple scenarios. Using the configuration file `configs/test_basic.json` which disables caching and connection reuse, we expect that the system provides an output similar to to the output below
+
+```
+Starting the super node.
+Waiting for super node to start...
+[Super Node] Starting server...
+Starting chord node 0 (127.0.0.1:8081).
+Starting chord node 1 (127.0.0.1:8082).
+Starting chord node 2 (127.0.0.1:8083).
+Starting chord node 3 (127.0.0.1:8084).
+Starting chord node 4 (127.0.0.1:8085).
+Waiting for DHT to be constructed...
+[Chord Node 5662] Requesting a join node from super node.
+[Chord Node 15209] Requesting a join node from super node.
+[Chord Node 47694] Requesting a join node from super node.
+[Chord Node 16421] Requesting a join node from super node.
+[Super Node] Node 127.0.0.1:8082 has requested to join the DHT.
+[Super Node] Attempting to acquire the DHT mutex.
+[Super Node] DHT is empty, returning empty NodeInfo to 127.0.0.1:8082
+[Chord Node 5662] Successfully received a join node from super node.
+...
+[Chord Node 58223] The DHT is busy, sleeping...
+[Chord Node 5662] Updating predecessor from 5662 to 15209.
+[Chord Node 5662] Updating successor from 5662 to 15209
+[Chord Node 15209] Finger table initialized to ['(15210,5662)', '(15211,5662)', '(15213,5662)', '(15217,5662)', '(15225,5662)', '(15241,5662)', '(15273,5662)', '(15337,5662)', '(15465,5662)', '(15721,5662)', '(16233,5662)', '(17257,5662)', '(19305,5662)', '(23401,5662)', '(31593,5662)', '(47977,5662)'].
+[Chord Node 15209] Forwarding request to find the predecessor of 15209 to 127.0.0.1:8082 (5662).
+[Chord Node 5662] Key 15209 is in the range (5662, 15209], returning current node info as the predecessor.
+[Chord Node 15209] Forwarding request to find the predecessor of 15208 to 127.0.0.1:8082 (5662).
+[Chord Node 5662] Key 15208 is in the range (5662, 15209], returning current node info as the predecessor.
+[Chord Node 5662] Updating finger table entry 2 from 5662 to 15209
+...
+[Client] Word "cat" has definition: "foo".
+[Client] Retrieving definition for word "dog" from the DHT.
+[Super Node] Returning node for client.
+[Chord Node 15209] Retrieving definition for word "dog" (25549)
+[Chord Node 15209] Forwarding request to retrieve definition for word "dog" (25549) to 127.0.0.1:8084 (16421)
+[Chord Node 16421] Retrieving definition for word "dog" (25549)
+[Chord Node 16421] Forwarding request to retrieve definition for word "dog" (25549) to 127.0.0.1:8083 (47694)
+[Chord Node 47694] Retrieving definition for word "dog" (25549)
+[Chord Node 47694] Word found in table "dog" (25549) to be "bar", returning result.
+[Client] Word "dog" has definition: "bar".
+[Client] Retrieving definition for word "mouse" from the DHT.
+[Super Node] Returning node for client.
+[Chord Node 47694] Retrieving definition for word "mouse" (50503)
+[Chord Node 47694] Forwarding request to retrieve definition for word "mouse" (50503) to 127.0.0.1:8085 (58223)
+[Chord Node 58223] Retrieving definition for word "mouse" (50503)
+[Chord Node 58223] Word found in table "mouse" (50503) to be "baz", returning result.
+[Client] Word "mouse" has definition: "baz".
+[Client] Finished executing 6 commands in 0.008942842483520508 seconds.
+Shutting down processes...
+```
+
+As seen above, the system behaves as expected. The DHT is initialized properly and the corresponding definitions for `cat`, `dot` and `mouse` where found to be `foo`, `bar` and `baz`. Furthermore, the nodes are stored and retrieved from the correct node.
+
+## Test Case 2: Dictionary Files
+
+As a slightly more involved test case, we expect that the client should be able to insertion definitions from a dictionary file into the DHT and load definitions from a word list from the DHT. Using the configuration file `configs/test_dict.json` we expect an output similar to the output below
 
 
+```
+...
+[Client] Inserting word "ROCHELIME" with definition "Lime in the lump after it is burned; quicklime. [Eng.]" into the DHT.
+[Chord Node 2132820005] Associating "ROCHELIME" (2234987387) with definition "Lime in the lump after it is burned; quicklime. [Eng.]".
+[Chord Node 2132820005] Forwarding request to insert "ROCHELIME" (2234987387) with definition "Lime in the lump after it is burned; quicklime. [Eng.]" to 127.0.0.1:8085 (2519982959).
+[Chord Node 2519982959] Associating "ROCHELIME" (2234987387) with definition "Lime in the lump after it is burned; quicklime. [Eng.]".
+[Chord Node 2519982959] Word "ROCHELIME" (2234987387) inserted with definition "Lime in the lump after it is burned; quicklime. [Eng.]".
+[Client] Inserting word "SALICYLIC" with definition "Pertaining to, derived from, or designating, an acid formerly obtained by fusing salicin with potassium hydroxide, and now made in large quantities from phenol (carbolic acid) by the action of carbon dioxide on heated sodium phenolate. It is a white crystalline substance. It is used as an antiseptic, and in its salts in the treatment of rheumatism. Called also hydroxybenzoic acid." into the DHT.
+[Chord Node 2132820005] Associating "SALICYLIC" (3626083264) with definition "Pertaining to, derived from, or designating, an acid formerly obtained by fusing salicin with potassium hydroxide, and now made in large quantities from phenol (carbolic acid) by the action of carbon dioxide on heated sodium phenolate. It is a white crystalline substance. It is used as an antiseptic, and in its salts in the treatment of rheumatism. Called also hydroxybenzoic acid.".
+...
+[Client] Word "VOCIFERATION" has definition: "The act of vociferating; violent outcry; vehement utterance of the voice. Violent gesture and vociferation naturally shake the hearts of the ignorant. Spectator. Plaintive strains succeeding the vociferations of emotion or of pain. Byron.".
+[Chord Node 2132820005] Retrieving definition for word "WEEVILY" (3143602188)
+[Chord Node 2132820005] Forwarding request to retrieve definition for word "WEEVILY" (3143602188) to 127.0.0.1:8085 (2519982959)
+[Chord Node 2519982959] Retrieving definition for word "WEEVILY" (3143602188)
+[Chord Node 2519982959] Forwarding request to retrieve definition for word "WEEVILY" (3143602188) to 127.0.0.1:8081 (36780905)
+[Chord Node 36780905] Retrieving definition for word "WEEVILY" (3143602188)
+[Chord Node 36780905] Word found in table "WEEVILY" (3143602188) to be "Having weevils; weeviled. [Written also weevilly.]", returning result.
+[Client] Word "WEEVILY" has definition: "Having weevils; weeviled. [Written also weevilly.]".
+[Chord Node 2132820005] Retrieving definition for word "WORDER" (1316791232)
+[Chord Node 2132820005] Word found in table "WORDER" (1316791232) to be "A speaker. [Obs.] Withlock.", returning result.
+[Client] Word "WORDER" has definition: "A speaker. [Obs.] Withlock.".
+[Client] Finished loading definitions from word list file "dictionary_words.txt".
+[Client] Writing loaded definitions to destination file "dictionary_defs.txt".
+[Client] Finished executing 5 commands in 0.11611533164978027 seconds.
+Shutting down processes...
+```
 
+Furthermore, the file `dictionary_defs.txt` should be present in the project directory. Upon running `diff dictionary dictionary_defs.txt` one should see that the two files are identical. 
+
+## Test Case 3: Error Handling
+
+The next test case is to ensure that the system is able to gracefully handle certain errors. More specifically, if the client attempts to retrieve the definition for a word that does not exist, a `WordNotFound` exception should be thrown. Furthermore, if caching is enabled and the client attempts to update a word, then a `DuplicateWord` word exception should be thrown. After running the system using the configuration file `configs/test_error.json` we expect an output similar to the output below
+
+```
+...
+[Client] Inserting word "mouse" with definition "fizz" into the DHT.
+[Chord Node 15209] Associating "mouse" (50503) with definition "fizz".
+[Chord Node 15209] Error, word "mouse" (50503) is already present in the DHT.
+[Client] Error, word "mouse" is already in the DHT.
+[Client] Inserting word "mouse" with definition "buzz" into the DHT.
+[Chord Node 15209] Associating "mouse" (50503) with definition "buzz".
+[Chord Node 15209] Error, word "mouse" (50503) is already present in the DHT.
+[Client] Error, word "mouse" is already in the DHT.
+[Client] Retrieving definition for word "mouse" from the DHT.
+[Chord Node 15209] Retrieving definition for word "mouse" (50503)
+[Chord Node 15209] Word found in table "mouse" (50503) to be "baz", returning result.
+[Client] Word "mouse" has definition: "baz".
+[Client] Retrieving definition for word "fish" from the DHT.
+[Chord Node 15209] Retrieving definition for word "fish" (29876)
+[Chord Node 15209] Forwarding request to retrieve definition for word "fish" (29876) to 127.0.0.1:8084 (16421)
+[Chord Node 16421] Retrieving definition for word "fish" (29876)
+[Chord Node 16421] Forwarding request to retrieve definition for word "fish" (29876) to 127.0.0.1:8083 (47694)
+[Chord Node 47694] Retrieving definition for word "fish" (29876)
+[Chord Node 47694] Error, word "fish" (29876) was not found in the DHT.
+[Client] Word "fish" has no definition associated to it.
+[Client] Finished executing 10 commands in 0.006342887878417969 seconds.
+Shutting down processes...
+```
+
+As we can see, the system correctly notifies the client if a word is already present in the DHT and if a definition is not present. 
+
+## Test Case 4: Remote Execution
+
+This test aims to show that the system works across multiple machines just as well as it does locally. By sshing into the keller lab machines and using the configuration file `configs/test_remote.json` we expect an output similar to the output below
+
+```
+```
+
+## Test Case 5: Single Node DHT
+
+Clearly, we should expect that the system works with any number of nodes, including a single node. Running the program with the confirugation file `configs/test_single.json` should display an output similar to the output below
+
+```
+Starting the super node.
+Waiting for super node to start...
+[Super Node] Starting server...
+Starting chord node 0 (127.0.0.1:8081).
+Waiting for DHT to be constructed...
+[Chord Node 15209] Requesting a join node from super node.
+[Super Node] Node 127.0.0.1:8081 has requested to join the DHT.
+[Super Node] Attempting to acquire the DHT mutex.
+[Super Node] DHT is empty, returning empty NodeInfo to 127.0.0.1:8081
+[Chord Node 15209] Successfully received a join node from super node.
+[Chord Node 15209] DHT is empty, initializing first node.
+[Chord Node 15209] Initialized chord node server...
+[Super Node] Recieved join event, releasing the DHT mutex.
+[Client] Connecting to the super node.
+[Super Node] Returning node for client.
+[Client] Connecting to chord node 15209 with address 127.0.0.1:8081.
+[Client] Inserting word "cat" with definition "foo" into the DHT.
+[Chord Node 15209] Associating "cat" (44919) with definition "foo".
+[Chord Node 15209] Word "cat" (44919) inserted with definition "foo".
+[Client] Inserting word "dog" with definition "bar" into the DHT.
+[Chord Node 15209] Associating "dog" (25549) with definition "bar".
+[Chord Node 15209] Word "dog" (25549) inserted with definition "bar".
+[Client] Inserting word "mouse" with definition "baz" into the DHT.
+[Chord Node 15209] Associating "mouse" (50503) with definition "baz".
+[Chord Node 15209] Word "mouse" (50503) inserted with definition "baz".
+[Client] Retrieving definition for word "cat" from the DHT.
+[Chord Node 15209] Retrieving definition for word "cat" (44919)
+[Chord Node 15209] Word found in table "cat" (44919) to be "foo", returning result.
+[Client] Word "cat" has definition: "foo".
+[Client] Retrieving definition for word "dog" from the DHT.
+[Chord Node 15209] Retrieving definition for word "dog" (25549)
+[Chord Node 15209] Word found in table "dog" (25549) to be "bar", returning result.
+[Client] Word "dog" has definition: "bar".
+[Client] Retrieving definition for word "mouse" from the DHT.
+[Chord Node 15209] Retrieving definition for word "mouse" (50503)
+[Chord Node 15209] Word found in table "mouse" (50503) to be "baz", returning result.
+[Client] Word "mouse" has definition: "baz".
+[Client] Finished executing 6 commands in 0.0024886131286621094 seconds.
+Shutting down processes...
+```
+
+Obviously, only using one chord node defeats the purpose of using a DHT, but we should expect that the system behaves correctly when only one node is in the system.
+
+## Test Case 6: DHT Updates
+
+Finally, we expect that the DHT correctly handles updates when caching is disabled. Using the configuration file `configs/test_update.json` we expect an output similar to the output below
+
+```
+...
+[Chord Node 47694] Associating "cat" (44919) with definition "foo".
+[Chord Node 47694] Word "cat" (44919) inserted with definition "foo".
+[Client] Inserting word "dog" with definition "bar" into the DHT.
+[Chord Node 47694] Associating "dog" (25549) with definition "bar".
+[Chord Node 47694] Word "dog" (25549) inserted with definition "bar".
+[Client] Inserting word "mouse" with definition "baz" into the DHT.
+[Chord Node 47694] Associating "mouse" (50503) with definition "baz".
+[Chord Node 47694] Forwarding request to insert "mouse" (50503) with definition "baz" to 127.0.0.1:8085 (58223).
+[Chord Node 58223] Associating "mouse" (50503) with definition "baz".
+[Chord Node 58223] Word "mouse" (50503) inserted with definition "baz".
+[Client] Inserting word "mouse" with definition "buzz" into the DHT.
+[Chord Node 47694] Associating "mouse" (50503) with definition "buzz".
+[Chord Node 47694] Forwarding request to insert "mouse" (50503) with definition "buzz" to 127.0.0.1:8085 (58223).
+[Chord Node 58223] Associating "mouse" (50503) with definition "buzz".
+[Chord Node 58223] Word "mouse" (50503) inserted with definition "buzz".
+[Client] Inserting word "mouse" with definition "cheese" into the DHT.
+[Chord Node 47694] Associating "mouse" (50503) with definition "cheese".
+[Chord Node 47694] Forwarding request to insert "mouse" (50503) with definition "cheese" to 127.0.0.1:8085 (58223).
+[Chord Node 58223] Associating "mouse" (50503) with definition "cheese".
+[Chord Node 58223] Word "mouse" (50503) inserted with definition "cheese".
+[Client] Finished executing 5 commands in 0.003169536590576172 seconds.
+```
+
+As we can see, with caching disabled, the system handles updates correctly.
