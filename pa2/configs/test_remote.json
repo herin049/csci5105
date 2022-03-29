@@ -1,7 +1,7 @@
 {
     "debug": true,
     "caching": true,
-    "num_bits": 64,
+    "num_bits": 32,
     "sleep_delay": 1,
     "reuse_connection": true,
     "client_commands": [
