@@ -110,6 +110,10 @@ The `chord_nodes` option is a list of objects that contain the address and port 
 
 It is important to note that the `run.py` script should always be ran in the root of the project directory. Furthermore, in the project directory path should be identical across all node servers. It is important that the Python virtual environment should be present in the `venv` folder, and the thrift files should be generated into the `gen` folder. 
 
+# Test Cases & Expected Output
+
+In the `configs` directory there are several configuration files used for testing the system. To run the system with any of these configuration files, simply provide the location to the configuration file as the only argument to the run script. For example, execute `python run.py configs/test_basic` to use the basic configuration. 
+
 
 
 
