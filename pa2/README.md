@@ -14,4 +14,29 @@ The implementation for the client is also relatively straightforward. First, the
 
 # Operation & Usage
 
+To run the system, start by initializing a python virtual environment by running 
+```bash
+source create-env.sh
+```
+in the root directory of the project. Alternatively, one can create the Python virtual environment by running
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
+Next, one needs to generate the required Thrift files by either running
+```bash
+source thrift-gen.sh
+```
+or by running
+```bash
+mkdir -p gen
+thrift -r --gen py -out gen service.thrift
+```
+
+After creating the virtual environment and generating the Thrift files, the system can be ran by running
+```
+python run.py <config file>
+```
+If a configuration file is not passed to `run.py` then the default configuration file `config.json` will be used. 
