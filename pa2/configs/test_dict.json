@@ -1,14 +1,15 @@
 {
     "debug": true,
     "caching": true,
-    "num_bits": 16,
+    "num_bits": 64,
     "sleep_delay": 1,
     "reuse_connection": true,
     "client_commands": [
-        "put cat foo",
-        "put dog bar",
-        "get cat",
-        "get dog"
+        "store dictionary.txt",
+        "get TRYSTER",
+        "get PHORONE",
+        "get banana",
+        "load dictionary_words.txt dictionary_defs.txt"
     ],
     "super_node": {
         "ip": "127.0.0.1",

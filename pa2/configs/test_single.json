@@ -7,8 +7,10 @@
     "client_commands": [
         "put cat foo",
         "put dog bar",
+        "put mouse baz",
         "get cat",
-        "get dog"
+        "get dog",
+        "get mouse"
     ],
     "super_node": {
         "ip": "127.0.0.1",
@@ -18,22 +20,6 @@
         {
             "ip": "127.0.0.1",
             "port": 8081
-        },
-        {
-            "ip": "127.0.0.1",
-            "port": 8082
-        },
-        {
-            "ip": "127.0.0.1",
-            "port": 8083
-        },
-        {
-            "ip": "127.0.0.1",
-            "port": 8084
-        },
-        {
-            "ip": "127.0.0.1",
-            "port": 8085
         }
     ]
 }

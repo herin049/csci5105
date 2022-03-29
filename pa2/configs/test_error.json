@@ -7,8 +7,14 @@
     "client_commands": [
         "put cat foo",
         "put dog bar",
+        "put mouse baz",
         "get cat",
-        "get dog"
+        "get dog",
+        "get mouse",
+        "put mouse fizz",
+        "put mouse buzz",
+        "get mouse",
+        "get fish"
     ],
     "super_node": {
         "ip": "127.0.0.1",

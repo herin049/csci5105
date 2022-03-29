@@ -1,14 +1,15 @@
 {
     "debug": true,
-    "caching": true,
+    "caching": false,
     "num_bits": 16,
     "sleep_delay": 1,
     "reuse_connection": true,
     "client_commands": [
         "put cat foo",
         "put dog bar",
-        "get cat",
-        "get dog"
+        "put mouse baz",
+        "put mouse buzz",
+        "put mouse cheese"
     ],
     "super_node": {
         "ip": "127.0.0.1",

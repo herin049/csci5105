@@ -1,0 +1,46 @@
+{
+    "debug": true,
+    "caching": true,
+    "num_bits": 64,
+    "sleep_delay": 1,
+    "reuse_connection": true,
+    "client_commands": [
+        "store dictionary.txt",
+        "get TRYSTER",
+        "put cat foo",
+        "put dog bar",
+        "get PHORONE",
+        "get banana",
+        "put mouse baz",
+        "get cat",
+        "get dog",
+        "get mouse",
+        "load dictionary_words.txt dictionary_defs.txt"
+    ],
+    "super_node": {
+        "ip": "kh4250-01.cselabs.umn.edu",
+        "port": 8080
+    },
+    "chord_nodes": [
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8081
+        },
+        {
+            "ip": "kh4250-03.cselabs.umn.edu",
+            "port": 8082
+        },
+        {
+            "ip": "kh4250-04.cselabs.umn.edu",
+            "port": 8083
+        },
+        {
+            "ip": "kh4250-05.cselabs.umn.edu",
+            "port": 8084
+        },
+        {
+            "ip": "kh4250-06.cselabs.umn.edu",
+            "port": 8085
+        }
+    ]
+}
