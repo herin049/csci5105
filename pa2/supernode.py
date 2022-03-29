@@ -40,7 +40,9 @@ class SuperNodeHandler:
         elif len(self.nodes) > 0:
             # If there are nodes already in the DHT, randomly return one of them
             log(f'Successfully acquired mutex, returning a random node to {ip}:{port}')
-            return self.nodes[random.randrange(len(self.nodes))]
+            join_node = self.nodes[random.randrange(len(self.nodes))]
+            self.nodes.append(NodeInfo(hash(f'{ip}:{port}', self.num_bits), ip, port))
+            return join_node
         else:
             # If the DHT is empty, return an empty NodeInfo object
             log(f'DHT is empty, returning empty NodeInfo to {ip}:{port}')
@@ -75,6 +77,8 @@ if __name__ == '__main__':
     num_bits = config['num_bits']
     DEBUG = config['debug']
     
+    random.seed()
+
     # Initialize the super node RPC server
     handler = SuperNodeHandler(num_bits)
     processor = SuperNodeService.Processor(handler)

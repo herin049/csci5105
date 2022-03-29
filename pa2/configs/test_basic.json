@@ -1,9 +1,9 @@
 {
     "debug": true,
-    "caching": true,
+    "caching": false,
     "num_bits": 16,
     "sleep_delay": 1,
-    "reuse_connection": true,
+    "reuse_connection": false,
     "client_commands": [
         "put cat foo",
         "put dog bar",

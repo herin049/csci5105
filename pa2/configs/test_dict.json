@@ -1,6 +1,6 @@
 {
     "debug": true,
-    "caching": true,
+    "caching": false,
     "num_bits": 32,
     "sleep_delay": 1,
     "reuse_connection": true,
