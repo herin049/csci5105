@@ -104,6 +104,12 @@ The `reuse_connection` option, when set to `true`, uses the same chord node when
 
 The `client_commands` option is a list of strings representing client commands that the client executed. A description for each of the four client commands was provided earlier. 
 
-The `super_node` option is simply an object which contains the address and port of the super node. If the address is `127.0.0.1` then the `run.py`
+The `super_node` option is simply an object which contains the address and port of the super node. If the address is `127.0.0.1` then the `run.py` script will run the super node client locally by creating a new process. Otherwise, the run script will SSH into the address provided with the user being the current user running the script. Then, the run script will activate the virtual environment and start the super node remotely. 
+
+The `chord_nodes` option is a list of objects that contain the address and port of each chord node. Similar to the super node, if the address is `127.0.0.1` then the `run.py` script will run the chord node locally by creating a new process. Otherwise, the run script will SSH into the target server, activate the virtual environment and start the chord node remotely. 
+
+It is important to note that the `run.py` script should always be ran in the root of the project directory. Furthermore, in the project directory path should be identical across all node servers. It is important that the Python virtual environment should be present in the `venv` folder, and the thrift files should be generated into the `gen` folder. 
+
+
 
 
