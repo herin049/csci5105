@@ -40,3 +40,70 @@ After creating the virtual environment and generating the Thrift files, the syst
 python run.py <config file>
 ```
 If a configuration file is not passed to `run.py` then the default configuration file `config.json` will be used. 
+
+Below is an example configuration file for the system 
+```json
+{
+    "debug": true,
+    "caching": true,
+    "num_bits": 32,
+    "sleep_delay": 1,
+    "reuse_connection": true,
+    "client_commands": [
+        "store dictionary.txt",
+        "get TRYSTER",
+        "put cat foo",
+        "put dog bar",
+        "get PHORONE",
+        "get banana",
+        "put mouse baz",
+        "get cat",
+        "get dog",
+        "get mouse",
+        "load dictionary_words.txt dictionary_defs.txt"
+    ],
+    "super_node": {
+        "ip": "kh4250-01.cselabs.umn.edu",
+        "port": 8080
+    },
+    "chord_nodes": [
+        {
+            "ip": "kh4250-02.cselabs.umn.edu",
+            "port": 8081
+        },
+        {
+            "ip": "kh4250-03.cselabs.umn.edu",
+            "port": 8082
+        },
+        {
+            "ip": "kh4250-04.cselabs.umn.edu",
+            "port": 8083
+        },
+        {
+            "ip": "kh4250-05.cselabs.umn.edu",
+            "port": 8084
+        },
+        {
+            "ip": "kh4250-06.cselabs.umn.edu",
+            "port": 8085
+        }
+    ]
+}
+```
+A description of the dehavior of each of the configuration options are given below.
+
+The `debug` option prints out additional information about requests being made when set to `true`.
+
+The `caching` option, when set to `true`, caches definitions for word on multiple nodes. For example, if a client makes a request to insert a definition for a word and the request travels along the path `6 -> 20 -> 57 -> 134` then nodes `6, 20` and `57` will also store the definition in addition to node `134`. As seen later in this document, enabling decreases the delay for subsequent `get` operations because more than just the assigned node will have the definition for the word. 
+
+The `num_bits` option specifies the number of bits that should be used for each key. This value should be no higher than around `60` because larger integers are unable to be sent over RPC using Thrift. Furthermore, it should be noted that using a smaller number of bits may create issues because of hash collisions. 
+
+The `sleep_delay` option specifies the number of seconds that nodes should wait while joining the DHT before requesting to join again after receiving a `DHTBusy` exception. 
+
+The `reuse_connection` option, when set to `true`, uses the same chord node when executing each client command. When this option is set to `false`, the client connects to a new chord node for each client command. Note that for the `load` and `store` commands, the client actually connects to a new chord node for each `word` in the corresponding files. 
+
+The `client_commands` option is a list of strings representing client commands that the client executed. A description for each of the four client commands was provided earlier. 
+
+The `super_node` option is simply an object which contains the address and port of the super node. If the address is `127.0.0.1` then the `run.py`
+
+
