@@ -241,7 +241,46 @@ As we can see, the system correctly notifies the client if a word is already pre
 This test aims to show that the system works across multiple machines just as well as it does locally. By sshing into the keller lab machines and using the configuration file `configs/test_remote.json` we expect an output similar to the output below
 
 ```
+Starting the super node.
+Waiting for super node to start...
+Starting chord node 0 (kh4250-12.cselabs.umn.edu:8081).
+Starting chord node 1 (kh4250-13.cselabs.umn.edu:8082).
+Starting chord node 2 (kh4250-14.cselabs.umn.edu:8083).
+Starting chord node 3 (kh4250-15.cselabs.umn.edu:8084).
+Starting chord node 4 (kh4250-16.cselabs.umn.edu:8085).
+Waiting for DHT to be constructed...
+[Chord Node 124585511] Requesting a join node from super node.
+[Chord Node 124585511] Successfully received a join node from super node.
+[Chord Node 124585511] DHT is empty, initializing first node.
+[Chord Node 124585511] Initialized chord node server...
+...
+[Chord Node 3905356469] Updating finger table entry 22 from 124585511 to 4042622808
+[Chord Node 3905356469] Finger table updated to: ['(3905356470,4042622808)', '(3905356471,4042622808)', '(3905356473,4042622808)', '(3905356477,4042622808)', '(3905356485,4042622808)', '(3905356501,4042622808)', '(3905356533,4042622808)', '(3905356597,4042622808)', '(3905356725,4042622808)', '(3905356981,4042622808)', '(3905357493,4042622808)', '(3905358517,4042622808)', '(3905360565,4042622808)', '(3905364661,4042622808)', '(3905372853,4042622808)', '(3905389237,4042622808)', '(3905422005,4042622808)', '(3905487541,4042622808)', '(3905618613,4042622808)', '(3905880757,4042622808)', '(3906405045,4042622808)', '(3907453621,4042622808)', '(3909550773,124585511)', '(3913745077,124585511)', '(3922133685,124585511)', '(3938910901,124585511)', '(3972465333,124585511)', '(4039574197,124585511)', '(4173791925,124585511)', '(147260085,1364676736)', '(684130997,1364676736)', '(1757872821,3236208289)']
+[Chord Node 3905356469] Key 4038428505 is in the range (3905356469, 4042622808], returning current node info as the predecessor.
+[Chord Node 3905356469] Updating finger table entry 23 from 124585511 to 4042622808
+...
+[Chord Node 3236208289] Retrieving definition for word "TRYSTER" (2274984792)
+[Chord Node 3236208289] Word found in table "TRYSTER" (2274984792) to be "One who makes an appointment, or tryst; one who meets with another.", returning result.
+[Chord Node 3236208289] Retrieving definition for word "UNCORRUPTION" (2806567764)
+[Chord Node 3236208289] Word found in table "UNCORRUPTION" (2806567764) to be "Incorruption.", returning result.
+[Chord Node 3236208289] Retrieving definition for word "UNRULIMENT" (3089093613)
+[Client] Word "UNRULIMENT" has definition: "Unruliness. [Obs.] "Breaking forth with rude unruliment." Spenser.".
+[Client] Word "VARTABED" has definition: "A doctor or teacher in the Armenian church. Members of this order of ecclesiastics frequently have charge of dioceses, with episcopal functions.".
+[Client] Word "VOCIFERATION" has definition: "The act of vociferating; violent outcry; vehement utterance of the voice. Violent gesture and vociferation naturally shake the hearts of the ignorant. Spectator. Plaintive strains succeeding the vociferations of emotion or of pain. Byron.".
+[Client] Word "WEEVILY" has definition: "Having weevils; weeviled. [Written also weevilly.]".
+[Client] Word "WORDER" has definition: "A speaker. [Obs.] Withlock.".
+[Client] Finished loading definitions from word list file "dictionary_words.txt".
+[Client] Writing loaded definitions to destination file "dictionary_defs.txt".
+[Client] Finished executing 11 commands in 1.399690866470337 seconds.
+Shutting down processes...
+Shutting down remote proccesses...
 ```
+
+As we can see the system still behaves correctly when running the system across several different machines. It should be noted that the output above is not completely accurate because not all of the output is forwarded over SSH, but indeed we see that the definitions are inserted and retrieved correctly. Furthermore, if you get the error 
+```
+OSError: [Errno 98] Address already in use
+```
+this likely means that other programs are already being ran on a machine with a conflicting port. To fix this, simply set the address of the nodes to different machines.
 
 ## Test Case 5: Single Node DHT
 
@@ -321,3 +360,11 @@ Finally, we expect that the DHT correctly handles updates when caching is disabl
 ```
 
 As we can see, with caching disabled, the system handles updates correctly.
+
+# Performance Analysis: Caching
+
+An mentioned above, caching may be used in a DHT to increase performance. We can measure this increase emperically by measuring the operation throughput of our system both when caching is disabled and enabled. Furthermore, to simulate a realistic scenario connection reused is disabled in attempt to mimic what would actually happen when thousands of clients are constantly inserting into the DHT. The configuration files `configs/test_cache.json` and `configs/test_nocache.json` correspond to enabling and disabling caching. 
+
+![](caching_chart.png)
+
+After running the system on the Keller machines, I found that it took 3.3903 seconds without caching and 2.8856 seconds with caching to both store and load 90 words. Thus, the throughput without caching is about 53 operations per second and with caching is 62 operations per second. Thus, caching leads to a considerable 16% increase in throughput. The results are also shown in the figure above. 
