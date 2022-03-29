@@ -3,7 +3,7 @@ from numpy import genfromtxt
 import numpy as np
 
 if __name__ == '__main__':
-    execution_time = [2.7746 , 2.3825]
+    execution_time = [3.3903 , 2.88562]
     operations_per_sec = [180 / e for e in execution_time]
     bars = ('Caching Disabled', 'Caching Enabled')
     y_pos = np.arange(len(bars))
