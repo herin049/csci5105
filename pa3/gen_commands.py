@@ -13,7 +13,7 @@ if __name__ == '__main__':
     file_name = sys.argv[5]
 
     def gen_str():
-        ''.join(random.choices(string.ascii_uppercase + string.digits, k=100))
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=100))
 
     files = []
     commands = []

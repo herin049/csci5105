@@ -40,15 +40,15 @@
     "clients": [
         {
             "host": "127.0.0.1",
-            "commands_file": "tests/1/commands0.txt"
+            "commands_file": "tests/2/commands0.txt"
         },
         {
             "host": "127.0.0.1",
-            "commands_file": "tests/1/commands1.txt"
+            "commands_file": "tests/2/commands1.txt"
         },
         {
             "host": "127.0.0.1",
-            "commands_file": "tests/1/commands2.txt"
+            "commands_file": "tests/2/commands2.txt"
         }
     ]
 }

@@ -1,0 +1,6 @@
+write c.txt cde
+write 3.txt 345
+list
+read x.txt
+read 998.txt
+read c.txt

@@ -34,7 +34,7 @@ class ReadWriteLock:
 
     def acquire_write(self):
         self.cv.acquire()
-        self.cv.wait_for(lambda: self.readers > 0)
+        self.cv.wait_for(lambda: self.readers == 0)
 
     def release_write(self):
         self.cv.release()

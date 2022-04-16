@@ -1,0 +1,6 @@
+write a.txt abc
+write 1.txt 123
+list
+read z.txt
+read 1000.txt
+read a.txt
