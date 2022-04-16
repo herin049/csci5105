@@ -1,5 +1,5 @@
 venv/
 gen/
 __pycache__/
-file_data/**
-!file_data
+file_data/*
+!file_data/.gitkeep 
