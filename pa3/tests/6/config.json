@@ -1,0 +1,54 @@
+{
+    "debug": true,
+    "q_write": 4,
+    "q_read": 4,
+    "storage_path": "file_data",
+    "coordinator_port": 8080,
+    "coordinator_sleep_delay": 3,
+    "locking_scheme": "default",
+    "servers": [
+        {
+            "host": "kh4250-04.cselabs.umn.edu",
+            "port": 8081,
+            "coordinator": true
+        },
+        {
+            "host": "kh4250-05.cselabs.umn.edu",
+            "port": 8082
+        },
+        {
+            "host": "kh4250-06.cselabs.umn.edu",
+            "port": 8083
+        },
+        {
+            "host": "kh4250-07.cselabs.umn.edu",
+            "port": 8084
+        },
+        {
+            "host": "kh4250-08.cselabs.umn.edu",
+            "port": 8085
+        },
+        {
+            "host": "kh4250-09.cselabs.umn.edu",
+            "port": 8086
+        },
+        {
+            "host": "kh4250-10.cselabs.umn.edu",
+            "port": 8087
+        }
+    ],
+    "clients": [
+        {
+            "host": "kh4250-01.cselabs.umn.edu",
+            "commands_file": "tests/0/commands0.txt"
+        },
+        {
+            "host": "kh4250-02.cselabs.umn.edu",
+            "commands_file": "tests/0/commands1.txt"
+        },
+        {
+            "host": "kh4250-03.cselabs.umn.edu",
+            "commands_file": "tests/0/commands2.txt"
+        }
+    ]
+}
