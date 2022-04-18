@@ -23,7 +23,7 @@ def connect_server(host: str, port: int) -> Tuple[ServerService.Client, TSocket.
 def main():
     config_file = 'config.json'
     if len(sys.argv) > 1:
-        config_file = sys.argv[2]
+        config_file = sys.argv[1]
     print('Client commands:')
     print('  write <file_name> <content> - overwrites the content in the file with name <file_name> with the content specificed in <content>')
     print('  read <file_name> - reads the content from the file with name <file_name>')
