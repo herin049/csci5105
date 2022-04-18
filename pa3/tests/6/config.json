@@ -3,38 +3,38 @@
     "q_write": 4,
     "q_read": 4,
     "storage_path": "file_data",
-    "coordinator_port": 8080,
+    "coordinator_port": 8130,
     "coordinator_sleep_delay": 3,
     "locking_scheme": "default",
     "servers": [
         {
             "host": "kh4250-04.cselabs.umn.edu",
-            "port": 8081,
+            "port": 8131,
             "coordinator": true
         },
         {
             "host": "kh4250-05.cselabs.umn.edu",
-            "port": 8082
+            "port": 8132
         },
         {
             "host": "kh4250-06.cselabs.umn.edu",
-            "port": 8083
+            "port": 8133
         },
         {
             "host": "kh4250-07.cselabs.umn.edu",
-            "port": 8084
+            "port": 8134
         },
         {
             "host": "kh4250-08.cselabs.umn.edu",
-            "port": 8085
+            "port": 8135
         },
         {
             "host": "kh4250-09.cselabs.umn.edu",
-            "port": 8086
+            "port": 8136
         },
         {
             "host": "kh4250-10.cselabs.umn.edu",
-            "port": 8087
+            "port": 8137
         }
     ],
     "clients": [
