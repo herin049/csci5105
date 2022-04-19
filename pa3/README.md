@@ -264,10 +264,50 @@ The next test case is to observe the behavior of the system when approximately 8
 [Client 0] File "0-8.txt" has content: "2J0HES84KRI4GLIX1O5720O0XATYLZ4QSHJ3CURLONH40BNROZUTFALMAN42HP4I5J75GPRLTCKYSAXSQIIS55P3WQ0HHUHJH1HU".
 [Client 0] Finished executing all commands in 1.8191101551055908 seconds.
 ```
-As we predicted, the read heavy workload was able to complete much faster than the mixed workload, indicating that there are no significant issues with the read operation. Likewise, manual verification will show that the contents of the files are correct for each read operation.
+As we predicted, the read heavy workload was able to complete much faster than the mixed workload, indicating that there are no significant issues with the read operations. Likewise, manual verification will show that the contents of the files are correct for each read operation.
 
 ## Test Case 3: Write Heavy Workload
 
+As a follow up to the read heavy workload test, it makes sense to also test the system under a write heavy workload when approximately 80% of the operations are write operations. In this test, we expect that the client should finish executing their commands in a longer amount of time compared to both the mixed and read heavy workloads because write operations are the most expensive operation in the system. Using the configuration file `tests/3/config.json` we expect an output similar to the output below
+
+```
+...
+[Server 6] (127.0.0.1): Updating version for file "1-5.txt" from 12 to 13.
+[Server 2] (127.0.0.1): Fetching contents of "2-1.txt" for coordinator.
+[Coordinator] (127.0.0.1): The version for file "0-6.txt" is 23.
+[Coordinator] (127.0.0.1): Updating file contents across all servers in write quorum.
+[Coordinator] (127.0.0.1): Finished writing to "1-5.txt".
+[Server 6] (127.0.0.1): Coordinator finished processing request to write to "1-5.txt".
+[Client 1] Wrote "5A7NHWRBUH1BVMTJTMAKX7EDZSXKQL5JH2RGSM4HFWYBMSX9LQQOEKTVBLBQA50VM0G9BF38I3UPN3GRQIRN2QDTYXYG4ZF73764" to file "1-5.txt".
+[Client 1] Finished executing all commands in 3.035496950149536 seconds.
+[Coordinator] (127.0.0.1): The contents for file "2-1.txt" are "RBA5ESEOYWS745IIPY0XQK48RM43IH54K943AJ4TPP39WES3HTXNFDMQ7WCMYR5AO8PFJOR7VE878ZTF4OOVOAITY54NZROV9F51".
+[Server 0] (127.0.0.1): Coordinator finished processing request to read from "2-1.txt".
+[Server 5] (127.0.0.1): Updating contents of file "0-6.txt" to "8QONI90O3PIW7D43TP4VRGPCMYYNQS0CJQMUO0QHY1VBWQUX1JI9TYG68UJWAB9RGB58QWNWOGLL4GFOPL82X2JUPOUSZ40UAAHC".
+[Client 2] File "2-1.txt" has content: "RBA5ESEOYWS745IIPY0XQK48RM43IH54K943AJ4TPP39WES3HTXNFDMQ7WCMYR5AO8PFJOR7VE878ZTF4OOVOAITY54NZROV9F51".
+[Client 2] Finished executing all commands in 3.0356786251068115 seconds.
+[Server 5] (127.0.0.1): Updating version for file "0-6.txt" from 22 to 24.
+[Server 2] (127.0.0.1): Updating contents of file "0-6.txt" to "8QONI90O3PIW7D43TP4VRGPCMYYNQS0CJQMUO0QHY1VBWQUX1JI9TYG68UJWAB9RGB58QWNWOGLL4GFOPL82X2JUPOUSZ40UAAHC".
+[Server 2] (127.0.0.1): Updating version for file "0-6.txt" from 23 to 24.
+[Server 0] (127.0.0.1): Updating contents of file "0-6.txt" to "8QONI90O3PIW7D43TP4VRGPCMYYNQS0CJQMUO0QHY1VBWQUX1JI9TYG68UJWAB9RGB58QWNWOGLL4GFOPL82X2JUPOUSZ40UAAHC".
+[Server 0] (127.0.0.1): Updating version for file "0-6.txt" from 21 to 24.
+[Server 3] (127.0.0.1): Updating contents of file "0-6.txt" to "8QONI90O3PIW7D43TP4VRGPCMYYNQS0CJQMUO0QHY1VBWQUX1JI9TYG68UJWAB9RGB58QWNWOGLL4GFOPL82X2JUPOUSZ40UAAHC".
+[Server 3] (127.0.0.1): Updating version for file "0-6.txt" from 23 to 24.
+[Coordinator] (127.0.0.1): Finished writing to "0-6.txt".
+[Server 4] (127.0.0.1): Coordinator finished processing request to write to "0-6.txt".
+[Client 0] Wrote "8QONI90O3PIW7D43TP4VRGPCMYYNQS0CJQMUO0QHY1VBWQUX1JI9TYG68UJWAB9RGB58QWNWOGLL4GFOPL82X2JUPOUSZ40UAAHC" to file "0-6.txt".
+[Client 0] Finished executing all commands in 3.0383620262145996 seconds.
+```
+Just as we expected, the write heavy workload took longer than both the mixed and read heavy workloads took to execute. These results indicate that performance wise our read and write operations are behaving as expected. Again, manual verification will show that the contents of the files are correct for each read operation.
+
+## Test Case 4: Read-Write Locks & Conflicting Operations
+
+
+
+## Test Case 5: Error Handling
+
+
+
+## Test Case 6: Remote Execution
 
 
 # Performance Analysis
