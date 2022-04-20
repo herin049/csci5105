@@ -301,13 +301,67 @@ Just as we expected, the write heavy workload took longer than both the mixed an
 
 ## Test Case 4: Read-Write Locks & Conflicting Operations
 
+Another test case is to ensure that the read-write lock options works as expected. That is, multiple readers should be able to read from the same file at once. Likewise, we should also expect that operations are serialized in order to guarentee sequential consistency. Using the configuration file `test/4/config.json` we expect an output similar to the output below
 
+```
+...
+[Server 3] (127.0.0.1): Updating contents of file "0-1.txt" to "2OJDN121YQFZWD00UXCAQU44ZH31WGIH4QE6TAHWL5C2VSLFOYE4LBSEHSOI7YJ9VMGZCLB8BJQ8R1A01KJLMST6X7HOO4EBBMNS".
+[Server 3] (127.0.0.1): Updating version for file "0-1.txt" from 29 to 32.
+[Server 4] (127.0.0.1): Updating contents of file "0-1.txt" to "2OJDN121YQFZWD00UXCAQU44ZH31WGIH4QE6TAHWL5C2VSLFOYE4LBSEHSOI7YJ9VMGZCLB8BJQ8R1A01KJLMST6X7HOO4EBBMNS".
+[Server 4] (127.0.0.1): Updating version for file "0-1.txt" from 31 to 32.
+[Server 5] (127.0.0.1): Updating contents of file "0-1.txt" to "2OJDN121YQFZWD00UXCAQU44ZH31WGIH4QE6TAHWL5C2VSLFOYE4LBSEHSOI7YJ9VMGZCLB8BJQ8R1A01KJLMST6X7HOO4EBBMNS".
+[Server 5] (127.0.0.1): Updating version for file "0-1.txt" from 30 to 32.
+[Server 2] (127.0.0.1): Updating contents of file "0-1.txt" to "2OJDN121YQFZWD00UXCAQU44ZH31WGIH4QE6TAHWL5C2VSLFOYE4LBSEHSOI7YJ9VMGZCLB8BJQ8R1A01KJLMST6X7HOO4EBBMNS".
+[Server 2] (127.0.0.1): Updating version for file "0-1.txt" from 27 to 32.
+[Coordinator] (127.0.0.1): Finished writing to "0-1.txt".
+[Server 1] (127.0.0.1): Coordinator finished processing request to write to "0-1.txt".
+[Client 0] Wrote "2OJDN121YQFZWD00UXCAQU44ZH31WGIH4QE6TAHWL5C2VSLFOYE4LBSEHSOI7YJ9VMGZCLB8BJQ8R1A01KJLMST6X7HOO4EBBMNS" to file "0-1.txt".
+[Server 4] (127.0.0.1): Received request to read contents from "0-9.txt".
+[Coordinator] (127.0.0.1): Received request to read contents from "0-9.txt".
+[Coordinator] (127.0.0.1): Formed read quorum consisting of servers: [('127.0.0.1', 8082), ('127.0.0.1', 8086), ('127.0.0.1', 8087), ('127.0.0.1', 8085)].
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8082 has version 30 for file "0-9.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8086 has version 32 for file "0-9.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8087 has version 32 for file "0-9.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8085 has version 31 for file "0-9.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8086 has the highest version (32) for file "0-9.txt".
+[Server 5] (127.0.0.1): Fetching contents of "0-9.txt" for coordinator.
+[Coordinator] (127.0.0.1): The contents for file "0-9.txt" are "3AS1D62QCI9G09MZRHL5QPZHRJMT6KFZWMQYXCEM7KOJUM03A0CDIU2XZ56VLS611HS8HSJ5G4YX308U70C1F4HXSOY2Y6DBYXJV".
+[Server 4] (127.0.0.1): Coordinator finished processing request to read from "0-9.txt".
+[Client 0] File "0-9.txt" has content: "3AS1D62QCI9G09MZRHL5QPZHRJMT6KFZWMQYXCEM7KOJUM03A0CDIU2XZ56VLS611HS8HSJ5G4YX308U70C1F4HXSOY2Y6DBYXJV".
+[Client 0] Finished executing all commands in 7.214054822921753 seconds.
+```
+As expected the operations take a considerably longer amount of time to execute because different clients are writing to the same file. However, we should see that indeed read/write operations are ordered properly and no concurrency issues are present.
 
 ## Test Case 5: Error Handling
 
-
+We should expect our system to be robust to different types of errors. One such error is attempting to read from a file that does not exist. We expect that the server will simply throw a `FileNotFound` error. Using the configuration file `tests/5/config.json` we expect an output similar to the output below
+```
+...
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8086 has version 0 for file "y.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8083 has version 0 for file "y.txt".
+[Server 6] (127.0.0.1): Received request to read contents from "x.txt".
+[Coordinator] (127.0.0.1): Received request to read contents from "x.txt".
+[Coordinator] (127.0.0.1): Formed read quorum consisting of servers: [('127.0.0.1', 8083), ('127.0.0.1', 8082), ('127.0.0.1', 8085), ('127.0.0.1', 8084)].
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8082 has version 0 for file "y.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8083 has version 0 for file "x.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8084 has version 0 for file "y.txt".
+[Coordinator] (127.0.0.1): No server was found to have a file version number greater than 0.
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8082 has version 0 for file "x.txt".
+[Client 1] Could not find file: "y.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8085 has version 0 for file "x.txt".
+[Server 4] (127.0.0.1): Received request to read contents from "999.txt".
+[Coordinator] (127.0.0.1): Received request to read contents from "999.txt".
+[Coordinator] (127.0.0.1): Server 127.0.0.1:8084 has version 0 for file "x.txt".
+[Coordinator] (127.0.0.1): Formed read quorum consisting of servers: [('127.0.0.1', 8083), ('127.0.0.1', 8086), ('127.0.0.1', 8082), ('127.0.0.1', 8085)].
+[Coordinator] (127.0.0.1): No server was found to have a file version number greater than 0.
+[Client 2] Could not find file: "x.txt".
+...
+```
+From the output above, we see that the system correctly handles the case when a file being read is not present. Likewise, the client correctly indicates that it could not find the corresponding file.
 
 ## Test Case 6: Remote Execution
+
+As a final test case, we expect our system to work correctly when different nodes are located on different machines. 
 
 
 # Performance Analysis
